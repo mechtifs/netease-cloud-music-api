@@ -8,7 +8,7 @@ pub(crate) mod model;
 use anyhow::{anyhow, Result};
 use encrypt::Crypto;
 pub use isahc::cookies::{CookieBuilder, CookieJar};
-use isahc::{prelude::*, *};
+use isahc::{config::SslOption, prelude::*, *};
 use lazy_static::lazy_static;
 pub use model::*;
 use regex::Regex;
@@ -108,6 +108,7 @@ impl MusicApi {
     pub fn set_proxy(&mut self, proxy: &str) -> Result<()> {
         if let Some(cookie_jar) = self.client.cookie_jar() {
             let client = HttpClient::builder()
+                .ssl_options(SslOption::DANGER_ACCEPT_INVALID_CERTS | SslOption::DANGER_ACCEPT_REVOKED_CERTS)
                 .timeout(Duration::from_secs(TIMEOUT))
                 .proxy(Some(proxy.parse()?))
                 .cookie_jar(cookie_jar.to_owned())
@@ -117,6 +118,7 @@ impl MusicApi {
             self.client = client;
         } else {
             let client = HttpClient::builder()
+                .ssl_options(SslOption::DANGER_ACCEPT_INVALID_CERTS | SslOption::DANGER_ACCEPT_REVOKED_CERTS)
                 .timeout(Duration::from_secs(TIMEOUT))
                 .proxy(Some(proxy.parse()?))
                 .cookies()
